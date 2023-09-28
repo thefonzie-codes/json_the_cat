@@ -1,27 +1,23 @@
 const request = require('request');
 
-const input = process.argv[2];
-
-let callCatApi = (input) => {
-    request(`https://api.thecatapi.com/v1/breeds/search?q=${input}`, (error, response, body) => {
+const fetchBreedDescription = (breedName, callback) => {
+  request(`https://api.thecatapi.com/v1/breeds/search?q=${breedName}`, (error, response, body) => {
       
     if (error) {
-      console.log('Request Failed: ', error);
-      process.exit()
+      callback(error);
+      process.exit();
     }
 
     const [data] = JSON.parse(body);
       
     if (data) { // we originally just receive text in HTML format - this converts it to JSON which we can read in terminal
-    console.log(data.description);
+      callback(null, data.description);
     }
 
     if (!data) {
-    console.log('Error: No data found');
+      callback(error, 'Breed not found');
     }
-
-    return ('Breed not found')
-  })
+  });
 };
 
-callCatApi(input);
+module.exports = fetchBreedDescription;
